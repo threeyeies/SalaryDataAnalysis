@@ -37,6 +37,20 @@ boxplot (Age ~ Salary, data = no_null_dt,
          xlab = "Salary", ylab = "Age", col = "salmon")
 
 
+# 4: Creación de un Modelo Predictivo
+set.seed (6699)
 
+trCtrl = trainControl(method = "cv", number = 10)
+
+#gbm : Modelo lineal generalizado---> regresión
+
+boostFit = train (Salary ~ Age + Gender + Education.Level + Job.Title +
+                    Years.of.Experience, trControl = trCtrl,
+                  method = "gbm", data = no_null_dt, verbose = FALSE)
+
+warnings()
+
+# Problema con la matriz de confusion, predicción
+confusionMatrix (no_null_dt$Salary, predict (boostFit, no_null_dt))
 
 
