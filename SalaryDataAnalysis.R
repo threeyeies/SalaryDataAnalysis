@@ -29,6 +29,31 @@ no_null_dt[!complete.cases(no_null_dt), ]
 no_null_dt$Gender <- ifelse(no_null_dt$Gender== "Male", 1, 0)
 
 
+
+
+
+
+
+
+#---------------------------------------------------------------------------
+
+# FALTARIA AGREGAR EL PCA apare ver que variables son las que elegimos para el modelo
+
+#--------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # ------------------------------------------------------------------------------
 # 3: Exploración y visualización de los datos
 summary (no_null_dt$Age)
@@ -36,7 +61,11 @@ boxplot (Age ~ Salary, data = no_null_dt,
          main = "Salary based on the Age of an individual",
          xlab = "Salary", ylab = "Age", col = "salmon")
 
+# Agregar mas EDA's
 
+
+
+# -------------------------------------------------------------------------------
 # 4: Creación de un Modelo Predictivo
 set.seed (6699)
 
