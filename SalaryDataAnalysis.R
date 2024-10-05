@@ -56,13 +56,29 @@ no_null_dt$Gender <- ifelse(no_null_dt$Gender== "Male", 1, 0)
 
 # ------------------------------------------------------------------------------
 # 3: Exploración y visualización de los datos
-summary (no_null_dt$Age)
-boxplot (Age ~ Salary, data = no_null_dt,
-         main = "Salary based on the Age of an individual",
-         xlab = "Salary", ylab = "Age", col = "salmon")
 
-# Agregar mas EDA's
+# Resumen estadístico de las variables de interés
+summary(no_null_dt$Salary)
+summary(no_null_dt$Years.of.Experience)
 
+# Gráfica de dispersión con línea de tendencia y R cuadrada
+ggplot(no_null_dt, aes(x = Years.of.Experience, y = Salary)) +
+  geom_point(color = "blue", size = 2) +  # puntos de dispersión
+  geom_smooth(method = "lm", se = FALSE, color = "red") +  # línea de tendencia
+  labs(title = "Scatter Plot of Salary vs Years of Experience",
+       x = "Years of Experience",
+       y = "Salary") +
+  theme_minimal()
+
+# Ajuste del modelo lineal simple
+linear_model <- lm(Salary ~ Years.of.Experience, data = no_null_dt)
+
+# Mostrar el resumen del modelo lineal para ver R²
+summary(linear_model)
+
+# Extraer el valor de R² del modelo lineal
+r_squared <- summary(linear_model)$r.squared
+cat("R² del modelo lineal:", r_squared, "\n")
 
 
 # -------------------------------------------------------------------------------
