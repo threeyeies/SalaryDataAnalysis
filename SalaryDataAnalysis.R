@@ -142,7 +142,7 @@ cat("R² del modelo: ", r_squared, "\n")
 
 
 # Problema con la matriz de confusion, predicción
-confusionMatrix (no_null_dt$Salary, predict (gbm_model, no_null_dt))
+#confusionMatrix (no_null_dt$Salary, predict (gbm_model, no_null_dt))
 
 
 
