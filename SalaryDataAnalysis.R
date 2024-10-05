@@ -27,7 +27,7 @@ no_null_dt[!complete.cases(no_null_dt), ]
 
 # Transformando la variable genero categorica a numerica
 no_null_dt$Gender <- ifelse(no_null_dt$Gender== "Male", 1, 0)
-
+str(no_null_dt)
 
 
 
