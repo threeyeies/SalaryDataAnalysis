@@ -79,7 +79,11 @@ ggplot(no_null_dt, aes(x = Years.of.Experience, y = Salary)) +
        y = "Salary") +
   theme_minimal()
 
-# Ajuste del modelo lineal simple
+
+#----------------------------------------------------------------------
+# 5 Generación del modelo de regresion lineañ
+
+# Creacion  del modelo lineal simple
 linear_model <- lm(Salary ~ Years.of.Experience, data = no_null_dt)
 
 # Mostrar el resumen del modelo lineal para ver R²
@@ -89,22 +93,6 @@ summary(linear_model)
 r_squared <- summary(linear_model)$r.squared
 cat("R² del modelo lineal:", r_squared, "\n")
 
-
-
-
-# -------------------------------------------------------------------------------
-# -------------------------------------------------------------------------------
-# 5: Creación de un Modelo Predictivo
-
-# Datos de entrada para realizar predicciones (nuevo empleado)
-nuevo_empleado <- data.frame(Years.of.Experience = c(5, 10, 15), Gender = c(1, 0, 1), Age = c(30, 45, 35))
-
-# 1. Predecir los salarios para los nuevos empleados basados en sus años de experiencia
-predicciones <- predict(linear_model, nuevo_empleado)
-
-# 2. Mostrar los resultados de las predicciones
-print("Predicciones de salarios para nuevos empleados:")
-print(predicciones)
 
 
 
@@ -143,8 +131,19 @@ r_squared <- cor(no_null_dt$Salary, salary_predictions)^2
 cat("R² del modelo: ", r_squared, "\n")
 
 
-# Problema con la matriz de confusion, predicción
-confusionMatrix (no_null_dt$Salary, predict (gbm_model, no_null_dt))
+# -------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
+# 5: Probando el modelo
+
+# Datos de entrada para realizar predicciones (nuevo empleado)
+nuevo_empleado <- data.frame(Years.of.Experience = c(5, 10, 15), Gender = c(1, 0, 1), Age = c(30, 45, 35))
+
+# 1. Predecir los salarios para los nuevos empleados basados en sus años de experiencia
+predicciones <- predict(linear_model, nuevo_empleado)
+
+# 2. Mostrar los resultados de las predicciones
+print("Predicciones de salarios para nuevos empleados:")
+print(predicciones)
 
 
 
