@@ -81,6 +81,7 @@ summary(linear_model)
 # Extraer el valor de R² del modelo lineal
 r_squared <- summary(linear_model)$r.squared
 cat("R² del modelo lineal:", r_squared, "\n")
+
 # -------------------------------------------------------------------------------
 # 5: Creación de un Modelo Predictivo
 set.seed (6699)
