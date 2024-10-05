@@ -92,8 +92,33 @@ summary(linear_model)
 # Extraer el valor de R² del modelo lineal
 r_squared <- summary(linear_model)$r.squared
 cat("R² del modelo lineal:", r_squared, "\n")
+# -------------------------------------------------------------------------------
+# Resumen estadístico de las variables de interés
+summary(no_null_dt$Salary)
+summary(no_null_dt$Years.of.Experience)
+summary(no_null_dt$Age)
+summary(no_null_dt$Gender)
+summary(no_null_dt$Education.Level)
+summary(no_null_dt$Job.Title)
 
+# Graficar la relación de las variables adicionales con el salario
+ggplot(no_null_dt, aes(x = Age, y = Salary)) +
+  geom_point(color = "blue", size = 2) +
+  geom_smooth(method = "lm", se = FALSE, color = "red") +
+  labs(title = "Scatter Plot of Salary vs Age",
+       x = "Age",
+       y = "Salary") +
+  theme_minimal()
 
+# Ajuste del modelo lineal múltiple con todas las variables
+multiple_linear_model <- lm(Salary ~ Years.of.Experience + Age + Gender + Education.Level + Job.Title, data = no_null_dt)
+
+# Mostrar el resumen del nuevo modelo para ver R²
+summary(multiple_linear_model)
+
+# Extraer el nuevo valor de R² del modelo lineal múltiple
+r_squared_multiple <- summary(multiple_linear_model)$r.squared
+cat("Nuevo R² del modelo lineal múltiple:", r_squared_multiple, "\n")
 # -------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------
 # 5: Probando el modelo
