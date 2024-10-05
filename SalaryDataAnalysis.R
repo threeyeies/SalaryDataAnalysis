@@ -94,14 +94,24 @@ r_squared <- summary(linear_model)$r.squared
 cat("R² del modelo lineal:", r_squared, "\n")
 
 
+# -------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
+# 5: Probando el modelo
+
+# Datos de entrada para realizar predicciones (nuevo empleado)
+nuevo_empleado <- data.frame(Years.of.Experience = c(5, 10, 15), Gender = c(1, 0, 1), Age = c(30, 45, 35))
+
+# 1. Predecir los salarios para los nuevos empleados basados en sus años de experiencia
+predicciones <- predict(linear_model, nuevo_empleado)
+
+# 2. Mostrar los resultados de las predicciones
+print("Predicciones de salarios para nuevos empleados:")
+print(predicciones)
 
 
 
-
-
-
-
-#Creación de un Modelo Predictivo
+#--------------------------------------------------------------------------------
+#6: Creación de un Modelo Predictivo
 
 set.seed(6699)
 
@@ -131,19 +141,8 @@ r_squared <- cor(no_null_dt$Salary, salary_predictions)^2
 cat("R² del modelo: ", r_squared, "\n")
 
 
-# -------------------------------------------------------------------------------
-# -------------------------------------------------------------------------------
-# 5: Probando el modelo
-
-# Datos de entrada para realizar predicciones (nuevo empleado)
-nuevo_empleado <- data.frame(Years.of.Experience = c(5, 10, 15), Gender = c(1, 0, 1), Age = c(30, 45, 35))
-
-# 1. Predecir los salarios para los nuevos empleados basados en sus años de experiencia
-predicciones <- predict(linear_model, nuevo_empleado)
-
-# 2. Mostrar los resultados de las predicciones
-print("Predicciones de salarios para nuevos empleados:")
-print(predicciones)
+# Problema con la matriz de confusion, predicción
+confusionMatrix (no_null_dt$Salary, predict (gbm_model, no_null_dt))
 
 
 
