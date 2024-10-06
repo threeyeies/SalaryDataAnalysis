@@ -12,7 +12,7 @@ library(factoextra)
 # -----------------------------------------------------------------------------
 # 2: PREPARACIÓN DE LOS DATOS
 
-#Obteniendo los datos
+#Obteniendo los datos de entrenamiento
 training_data <- read.csv("Salary_Data.csv")
 
 #Mostrando 
@@ -111,26 +111,126 @@ print(predicciones)
 
 
 #--------------------------------------------------------------------------------
-#6: Creación de un Modelo Predictivo
+#6: Creación de un Modelo Predictivo (un modelo efectivo)
 
+# Estableciendo la semilla = numero de registros tratados (sin nulos, etc)
 set.seed(6699)
 
-# Control del entrenamiento: validación cruzada
+# Control del entrenamiento: validación cruzada con 10 iteraciones
 trCtrl <- trainControl(method = "cv", number = 10)
 
-# Modelo GBM (Gradient Boosting Machine) para predicción de Salary
+# Modelo GBM (Gradient Boosting Machine) para predicción de Salary  (ESPERAR A QUE TERMINE!!!)
 gbm_model <- train(Salary ~ Age + Gender + Education.Level + Job.Title +
                      Years.of.Experience, trControl = trCtrl,
                    method = "gbm", data = no_null_dt, verbose = FALSE)
 
+# Mostrar las advertencias que ocurriesen durante la generación del modelo GBM
+warnings()
+
 # Mostrar el resumen del modelo 
 print(gbm_model)
 
-# Realizar predicciones sobre los datos de entrenamiento
+# Mostrar los resultados de la validación cruzada
+print(gbm_model$results)
+
+# Mostrar métricas de cada fold en la validación cruzada
+print(gbm_model$resample)
+
+# Mostrar la precisión del modelo a lo largo de las iteraciones de la validación cruzada
+plot(gbm_model)
+
+# Realizar predicciones sobre los datos de entrenamiento 
 salary_predictions <- predict(gbm_model, no_null_dt)
+
+no_null_dtAdapt <- no_null_dt # Copy a nueva variable de los datos de entrenamiento para hacer la matriz de correlación
+no_null_dtAdapt$predicted = predict (gbm_model, no_null_dtAdapt) # Predecir y agregar columna a la nueva variable anterior
 
 # Mostrar las primeras predicciones y los valores reales
 head(data.frame(Real = no_null_dt$Salary, Predicted = salary_predictions))
+
+
+
+# Tabla de contingencia que muestra la relación entre los valores reales de 'Salary' y los valores predichos.
+# Esto permite ver cuántas predicciones coinciden con los valores reales.
+table(no_null_dtAdapt$Salary, no_null_dtAdapt$predicted)
+
+# Crear un data frame llamado 'actuals_preds_train' que contiene dos columnas: actuals y predict
+# Se utiliza 'cbind()' para combinar estas dos columnas.
+actuals_preds_train <- data.frame(cbind(actuals=no_null_dtAdapt$Salary, predicted=no_null_dtAdapt$predicted))
+
+# Mostrar las primeras filas del data frame 'actuals_preds' para tener una vista rápida de los datos reales y predichos
+head(actuals_preds_train) 
+
+# Matriz de correlación entre las columnas 'actuals' y 'predicted' 
+# Muestra como se relacionan los valores reales y los valores predichos.
+correlation_accuracy_train <- cor(actuals_preds_train)
+
+
+print(correlation_accuracy_train) # Imprimir la matriz de correlación
+View(correlation_accuracy_train) #Abrir la variable desde environment que contiene a la matriz de correlación (opcional)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#confusionMatrix (no_null_dt$Salary, predict (gbm_model, no_null_dt))
+# ------------------------------------------------------------------------------
+# INCOMPATIBILIDAD CON LA MATEIZ DE CONFUSIÓN: GMB predice valores continuos
+# ------Por lo tanto no es posible entregar una matriz de validación cruzada--------
+# Debido a que  en modelos de regresión, como el modelo GBM que se está...
+# utilizando para predecir el salario, NO SE PUEDE UTILIZAR una.. 
+# matriz de confusión directamente, ya que esta se emplea en...
+# modelos de clasificación (donde se predicen clases discretas, no valores continuos).
+# Sin embargo, hay varias métricas y métodos análogos para evaluar...
+# la calidad de un modelo de regresión que desempeñan un papel similar...
+# al de la matriz de confusión en clasificación. 
+# Algunas de las más comunes son:
+#----------------------------------------------------------------------------------
+
+# Curva de Predicción Real (Real vs. Predicted Plot):
+# Gráfico que compara los valores predichos con los reales, 
+# lo que permite visualizar qué tan bien el modelo ajusta los datos
+plot(no_null_dt$Salary, salary_predictions,
+     main="Real vs Predicted",
+     xlab="Real Salary", ylab="Predicted Salary",
+     pch=19, col="blue")
+abline(0,1,col="red",lwd=2) # Línea de referencia ideal
+
+
+
+# Gráfico de Residuales
+# Un gráfico de los errores residuales (la diferencia entre los valores reales y los predichos) 
+# permite verificar si los residuos están distribuidos de manera uniforme, lo cual es un indicador de un buen ajuste.
+residuals <- no_null_dt$Salary - salary_predictions
+plot(salary_predictions, residuals,
+     main="Residuals vs Predicted",
+     xlab="Predicted Salary", ylab="Residuals",
+     pch=19, col="purple")
+abline(h=0, col="red", lwd=2)
+
+
+# Distribución de Errores
+# Con la distribución de los errores residuales se asegura que... 
+# siguen una distribución aproximadamente normal, 
+# lo que es un buen indicativo de que el modelo no está sesgado.
+hist(residuals, breaks=20, col="grey", main="Distribution of Residuals")
+
 
 # Cálculo de RMSE (Root Mean Squared Error)
 rmse_value <- sqrt(mean((no_null_dt$Salary - salary_predictions)^2))
@@ -141,12 +241,53 @@ r_squared <- cor(no_null_dt$Salary, salary_predictions)^2
 cat("R² del modelo: ", r_squared, "\n")
 
 
-# Problema con la matriz de confusion, predicción
-#confusionMatrix (no_null_dt$Salary, predict (gbm_model, no_null_dt))
+#------------------------------------------------------------------------------
+# 7: Carga y Evaluación del conjunto de datos de prueba
+
+# Obteniendo datos de prueba (Testing)
+testing_data <- read.csv("Salary_Testing_Data.csv")
+
+# Visualizando
+str(testing_data)
+
+# Revisando que renglones contienen datos nulos
+testing_data[!complete.cases(testing_data), ]
+
+no_null_dtt <- testing_data
+
+# Quitando datos nulos 
+no_null_dtt <- na.omit(testing_data)
+no_null_dtt[!complete.cases(no_null_dtt), ]
+
+# Transformando la variable genero categorica a numerica
+no_null_dtt$Gender <- ifelse(no_null_dtt$Gender== "Male", 1, 0)
+str(no_null_dtt)
 
 
+#------------------------------------------------------------------------------
+# 8: Validando el modelo con datos de prueba (Testing)
+
+# Prediciendo con el modelo predictivo GBM con los datos de prueba
+no_null_dtt$predicted = predict (gbm_model, no_null_dtt)
+
+# Tabla de contingencia que muestra la relación entre los valores reales de 'Salary' y los valores predichos.
+# Esto permite ver cuántas predicciones coinciden con los valores reales.
+table(no_null_dtt$Salary, no_null_dtt$predicted)
+
+# Crear un data frame llamado 'actuals_preds' que contiene dos columnas:
+# 1. 'actuals': los valores reales de salario provenientes del conjunto de datos 'no_null_dtt$Salary'.
+# 2. 'predicted': los valores predichos por el modelo almacenados en 'no_null_dtt$predicted'.
+# Se utiliza 'cbind()' para combinar estas dos columnas.
+actuals_preds <- data.frame(cbind(actuals=no_null_dtt$Salary, predicted=no_null_dtt$predicted))
+
+# Mostrar las primeras filas del data frame 'actuals_preds' para tener una vista rápida de los datos reales y predichos
+head(actuals_preds) 
+
+# Matriz de correlación entre las columnas 'actuals' y 'predicted' 
+# Muestra como se relacionan los valores reales y los valores predichos.
+correlation_accuracy <- cor(actuals_preds)
 
 
-
-
+print(correlation_accuracy) # Imprimir la matriz de correlación
+View(correlation_accuracy) #Abrir la variable desde environment que contiene a la matriz de correlación (opcional)
 
